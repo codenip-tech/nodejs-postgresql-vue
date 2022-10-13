@@ -1,0 +1,87 @@
+<html>
+<head>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <ul>
+        <li v-cloak v-for="todo in todos" :key="todo.id">
+            <a href="#" @click="deleteTodo(todo.id)">{{ todo.name }}</a>
+            <button @click="toggleDone(todo.id)">{{ todo.done ? 'Mark as not done' : 'Mark as done' }}</button>
+        </li>
+    </ul>
+
+    <label for="todo_name">
+        Todo name
+        <input name="todo_name" type="text" v-model="newTodoName" />
+    </label>
+    <button @click="create()">Create</button>
+</div>
+<script src="https://unpkg.com/vue@3"></script>
+<script>
+    const { createApp } = Vue
+    createApp({
+        data() {
+            return {
+                todos: [],
+                newTodoName: ''
+            }
+        },
+        async beforeMount() {
+            await this.fetchTodos()
+        },
+        methods: {
+            async fetchTodos() {
+                const response = await fetch('/api/todo')
+                this.todos = await response.json()
+            },
+            async deleteTodo(id) {
+                await fetch(`/api/todo/${id}`, {
+                    method: 'DELETE'
+                })
+                await this.fetchTodos()
+            },
+            async create() {
+                this.todos.push({
+                    name: this.newTodoName,
+                    done: false
+                })
+                const newTodoName = this.newTodoName
+                this.newTodoName = ''
+                try {
+                    await fetch('/api/todo', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            name: newTodoName
+                        }),
+                        headers: {
+                            'content-type': 'application/json'
+                        }
+                    })
+                } catch (e) {
+                    this.todos.pop()
+                }
+
+                await this.fetchTodos()
+            },
+            async toggleDone(id) {
+                await fetch(`/api/todo/${id}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        done: !this.todos.find(t => t.id === id).done
+                    }),
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                })
+                await this.fetchTodos()
+            }
+        }
+    }).mount('#app')
+</script>
+</body>
+</html>

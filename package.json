@@ -1,0 +1,16 @@
+{
+  "name": "node-vue-postgres",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon"
+  },
+  "dependencies": {
+    "express": "^5.0.0-beta.1",
+    "express-async-router": "^0.1.15",
+    "nodemon": "^2.0.20",
+    "pg": "^8.8.0",
+    "qs": "^6.11.0"
+  }
+}
