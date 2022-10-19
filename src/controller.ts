@@ -1,21 +1,23 @@
-const express = require("express");
-const router = express.Router()
-const { todoRepository, NotFoundError } = require('./todo-repository')
+import { Router, Request, Response } from 'express';
+import { todoRepository, NotFoundError } from './todo-repository'
 
-router.get('/', async (req, res) => {
+const router = Router()
+
+router.get('/', async (req: Request, res: Response) => {
     const todos = await todoRepository.findAll()
+
     res.json(todos)
 })
 
-router.post('/', async (req, res) => {
+router.post('/', async (req: Request<any, any, { name: string }>, res: Response) => {
     const body = req.body
     await todoRepository.create({ name: body.name })
     const todos = todoRepository.findAll()
     res.json(todos)
 })
 
-router.delete(`/:id`, async (req, res) => {
-    const id = req.params.id
+router.delete(`/:id`, async (req: Request<{ id: string }>, res: Response) => {
+    const id = parseInt(req.params.id)
     try {
         await todoRepository.deleteOne(id)
         res.status(204).send()
@@ -28,11 +30,11 @@ router.delete(`/:id`, async (req, res) => {
     }
 })
 
-router.patch(`/:id`, async (req, res) => {
-    const id = req.params.id
+router.patch(`/:id`, async (req: Request<{ id: string }>, res: Response) => {
+    const id = parseInt(req.params.id)
     const body = req.body
     await todoRepository.updateDone(id, body.done)
     res.status(204).send()
 })
 
-module.exports = router
+export default router

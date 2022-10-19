@@ -6,4 +6,4 @@ const client = new Client({
     password: 'postgres',
 })
 
-module.exports = { client }
+export { client }
